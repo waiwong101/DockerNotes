@@ -1,0 +1,142 @@
+Installation
+Compose:
+http://docs.docker.com/compose/install/
+Docker:
+https://docs.docker.com/installation/ubuntulinux/
+====
+docker version:
+docker -v <- returns docker version
+
+update docker to latest:
+wget -qO- https://get.docker.com/ | sh
+
+--- Docker
+EC2
+http://www.linuxfunda.com/2013/10/06/how-to-install-and-configure-docker-on-ubuntu-12-04-lts/
+
+Non-EC2
+docker stores containers and volumes in /var/lib/docker
+docker exec -it trusting_almeida bash (To get into shell of a running container replace trusting_almeida with contain name of ID)
+docker ps - Lists containers.
+docker logs - Shows us the standard output of a container.
+docker stop - Stops running containers.
+docker version - command to return version information on the currently installed Docker client and daemon.
+* By default, the docker ps command only shows information about running containers. If you want to see stopped containers too use the -a flag.
+* docker ps -l. This tells the docker ps command to return the details of the last container started.
+sudo docker top nostalgic_morse
+* examine the processes running inside
+sudo docker inspect nostalgic_morse - Lastly, we can take a low-level dive into our Docker container using the docker inspect command. It returns a JSON hash of useful configuration and status information about Docker containers.
+We can also narrow down the information we want to return by requesting a specific element, for example to return the container's IP address we would:
+$ sudo docker inspect -f '{{ .NetworkSettings.IPAddress }}' nostalgic_morse
+172.17.0.5
+
+you can create a new container or restart the old one. Let's look at starting our previous container back up.
+$ sudo docker start nostalgic_morse
+
+docker restart - runs a stop and then start on the container.
+
+To remove web container:
+$ sudo docker stop nostalgic_morse
+nostalgic_morse
+$ sudo docker rm nostalgic_morse
+nostalgic_morse
+
+To remove image, perform remove web container above, then:
+$ sudo docker rmi nostalgic_morse
+
+- 
+sudo docker images - listing the images we have locally on our host.
+
+how do we get new images? Well Docker will automatically download any image we use that isn't already present on the Docker host. But this can potentially add some time to the launch of a container. If we want to pre-load an image we can download it using the docker pull command. Let's say we'd like to download the centos image.
+$ sudo docker pull centos
+
+Create Dockerfile and image:
+To do this we create a Dockerfile that contains a set of instructions that tell Docker how to build our image.
+
+Let's create a directory and a Dockerfile first.
+
+$ mkdir sinatra
+$ cd sinatra
+$ touch Dockerfile
+
+nano Dockerfile:
+# This is a comment
+FROM ubuntu:14.04
+MAINTAINER Kate Smith <ksmith@example.com>
+RUN apt-get update && apt-get install -y ruby ruby-dev
+RUN gem install sinatra
+
+To build image with the DockerFile
+sudo docker build -t="ouruser/sinatra:v2" .
+
+We can then create a container from our new image.
+$ sudo docker run -t -i ouruser/sinatra:v2 /bin/bash
+
+To Remove an image from the host:
+sudo docker rmi training/sinatra
+or image id
+
+-
+
+--- Non-interactive Container
+sudo docker run ubuntu:14.04 /bin/echo 'Hello world
+When you specify an image, Docker looks first for the image on your Docker host. If it can't find it then it downloads the image from the public image registry: Docker Hub. https://hub.docker.com/
+Next we told Docker what command to run inside our new container:
+/bin/echo 'Hello world'
+So what happened to our container after that? Well Docker containers only run as long as the command you specify is active. Here, as soon as Hello world was echoed, the container stopped.
+--- Interactive Container
+sudo docker run -t -i ubuntu:14.04 /bin/bash
+The -t flag assigns a pseudo-tty or terminal inside our new container and the -i flag allows us to make an interactive connection by grabbing the standard in (STDIN) of the container.
+exit ; to exit container
+--- A Daemonized Hello world
+sudo docker run -d ubuntu:14.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
+flag: -d. The -d flag tells Docker to run the container and put it in the background, to daemonize it.
+So why aren't we seeing any hello world's? Instead Docker has returned a really long string:
+1e5535038e285177d5214659a068137486f96ee5c2e85a4ac52dc83f2ebe4147
+$ sudo docker ps
+CONTAINER ID  IMAGE         COMMAND               CREATED        STATUS       PORTS NAMES
+1e5535038e28  ubuntu:14.04  /bin/sh -c 'while tr  2 minutes ago  Up 1 minute        insane_babbage
+
+The docker ps command queries the Docker daemon for information about all the containers it knows about.
+
+$ sudo docker logs insane_babbage
+hello world
+hello world
+hello world
+
+The docker logs command looks inside the container and returns its standard output: in this case the output of our command hello world.
+
+To stop our daemonized container. To do this we use the docker stop command.
+
+$ sudo docker stop insane_babbage
+insane_babbage
+
+The docker stop command tells Docker to politely stop the running container. If it succeeds it will return the name of the container it has just stopped.
+--- Running Web Application
+$ sudo docker run -d -P training/webapp python app.py
+The -P flag is new and tells Docker to map any required network ports inside our container to our host. This lets us view our web application.
+
+$ sudo docker ps -l
+CONTAINER ID  IMAGE                   COMMAND       CREATED        STATUS        PORTS                    NAMES
+bc533791f3f5  training/webapp:latest  python app.py 5 seconds ago  Up 2 seconds  0.0.0.0:49155->5000/tcp  nostalgic_morse
+
+In this case Docker has exposed port 5000 (the default Python Flask port) on port 49155.
+
+If we need to change port:
+$ sudo docker run -d -p 5000:5000 training/webapp python app.py
+This would map port 5000 inside our container to port 5000 on our local host. You might be asking about now: why wouldn't we just want to always use 1:1 port mappings in Docker containers rather than mapping to high ports? Well 1:1 mappings have the constraint of only being able to map one of each port on your local host. Let's say you want to test two Python applications: both bound to port 5000 inside your container. Without Docker's port mapping you could only access one at a time.
+
+To map 1 to 1:
+sudo docker run -d -p 5000:5000 training/webapp python app.py
+
+---
+
+docker ps
+
+
+Settings->About the Phone->System Updates->Update Profile
+
+---
+docker network create app
+docker network rm app
+docker network ls
