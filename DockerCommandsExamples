@@ -134,6 +134,11 @@ This would map port 5000 inside our container to port 5000 on our local host. Yo
 To map 1 to 1:
 sudo docker run -d -p 5000:5000 training/webapp python app.py
 
+
+cp
+https://www.digitalocean.com/community/tutorials/how-to-run-nginx-in-a-docker-container-on-ubuntu-14-04
+If you'd like to take a look at the default config file, just copy it using the Docker copy command:
+sudo docker cp docker-nginx:/etc/nginx/conf.d/default.conf default.conf
 ---
 
 docker ps
