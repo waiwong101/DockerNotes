@@ -14,6 +14,11 @@ docker -v <- returns docker version
 
 update docker to latest:
 wget -qO- https://get.docker.com/ | sh
+====
+Delete all containers
+docker rm $(docker ps -a -q)
+Delete all images
+docker rmi $(docker images -q)
 
 --- Docker
 EC2
