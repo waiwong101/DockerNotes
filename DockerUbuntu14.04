@@ -65,6 +65,8 @@ services:
     depends_on:
       - db
     image: wordpress:latest
+    volumes:
+      - "./wordpress/wp_html:/var/www/html"
     links:
       - db
     ports:
@@ -77,3 +79,14 @@ services:
 === run docker-compose from project directory:
 docker-compose up -d
 
+/// if modify docker-compose
+Stop your currently running docker-compose session:
+
+docker-compose stop
+Remove the existing container so we can map the volume to the host filesystem:
+
+# Modify your docker-compose.yml before removing the old image
+docker-compose rm wordpress
+
+# Start WordPress again:
+docker-compose up -d
