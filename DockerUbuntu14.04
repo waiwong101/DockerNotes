@@ -79,7 +79,7 @@ services:
 === run docker-compose from project directory:
 docker-compose up -d
 
-/// if modify docker-compose
+/// if modify docker-compose: https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-and-phpmyadmin-with-docker-compose-on-ubuntu-14-04
 Stop your currently running docker-compose session:
 
 docker-compose stop
